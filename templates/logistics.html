@@ -1,0 +1,216 @@
+{% extends "/templates/_event.html" %}
+{% block event %}
+    {% for guest in event.event_guests %}
+        {% if guest.guest_id == user_entity.user_id and guest.guest_permissions == "admin" %}
+        <button class="btn btn-primary gotoAdd"><span class="glyphicon glyphicon-chevron-down"></span> Go to Add Logistics</button>
+        <br>
+        <br>
+        {% endif %}
+    {% endfor %}
+
+    {% for logistic in logistics %}
+        {% if logistic.logistics_type == "crowdfunding" %}
+        <div class="panel panel-default" data-type="{{ logistic.logistics_type|capitalize }}">
+            <div class="panel-heading">
+                <h3 class="panel-title">Crowdfunding</h3>
+            </div>
+            <div class="panel-body">
+                <div class="logisticsShown">
+                    <div class="row">
+                        <div class="col-xs-12 col-md-9">
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    {{ logistic.logistics_notes }}
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                            {% for pledge in logistic.logistics_pledges %}
+                                            <tr>
+                                                <td class="col-xs-5 col-sm-7 col-md-8 col-lg-9" data-pledge-id="{{ pledge.pledge_id }}">$<span class="money">{{ pledge.pledge_amount }}</span></td>
+                                                <td class="col-xs-7 col-sm-5 col-md-4 col-lg-3">
+                                                    {% for user in users_list %}
+                                                        {% if user.user_id == pledge.pledge_id %}
+                                                            <img src="{{ user.user_public_profile_photo_url }}" class="img-profile">
+                                                            <a href="{{ user.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-md-3">
+                            <div class="large-text backers">
+                                {% set backers = 0 %}
+                                {% for pledge in logistic.logistics_pledges %}
+                                    {% set backers = backers + 1  %}
+                                    {% if loop.last %}
+                                        {{ backers }}
+                                    {% endif %}
+                                    {% else %}
+                                    0
+                                {% endfor %}
+                            </div>
+                            <h4>backers</h4>
+                            <div class="large-text pledged">
+                                {% set pledged = 0 %}
+                                {% for pledge in logistic.logistics_pledges %}
+                                    {% set pledged = pledged + pledge.pledge_amount  %}
+                                    {% if loop.last %}
+                                        $<span class="money">{{ pledged }}</span>
+                                    {% endif %}
+                                    {% else %}
+                                    $<span class="money">0.00</span>
+                                {% endfor %}
+                            </div>
+                            <h4>pledged of $<span class="money">{{ logistic.logistics_goal }}</span> goal</h4>
+                        </div>
+                    </div>
+                </div>
+                {% for guest in event.event_guests %}
+                    {% if guest.guest_id == user_entity.user_id and guest.guest_permissions == "admin" %}
+                    <form class="form-horizontal editLogisticsForm" data-logistics-type="{{ logistic.logistics_type }}">
+                        <div class="form-group">
+                            <label for="inputLogisticsNotes" class="col-xs-3 col-sm-2 control-label">Logistics Notes:</label>
+                            <div class="col-xs-9 col-sm-10">
+                                <textarea class="form-control wysihtml5 editLogisticsNotes" id="inputLogisticsNotes" rows="10" placeholder="Notes for Logistics" name="logistics_notes">{{ logistic.logistics_notes }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-3 visible-xs"></div>
+                            <div class="col-xs-9 col-sm-10 col-sm-offset-2">
+                                <button type="button" class="btn btn-primary submitEditLogistics" data-id="{{ event.key.integer_id() }}" data-logistics-id="{{ logistic.key.integer_id() }}"><span class="glyphicon glyphicon-edit"></span> Edit Logistics</button>
+                                <button type="button" class="btn btn-default cancelEditLogistics"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% for guest in event.event_guests %}
+                {% if guest.guest_id == user_entity.user_id %}
+                    <div class="panel-footer text-right">
+                        <button class="btn btn-success suggestPledge" data-id="{{ event.key.integer_id() }}" data-logistics-id="{{ logistic.key.integer_id() }}"><span class="glyphicon glyphicon-gift"></span></button>
+                        {% if guest.guest_permissions == "admin" %}
+                        <button class="btn btn-primary editLogistics" data-id="{{ event.key.integer_id() }}" data-logistics-id="{{ logistic.key.integer_id() }}"><span class="glyphicon glyphicon-edit"></span></button>
+                        <button class="btn btn-danger deleteLogistics" data-id="{{ event.key.integer_id() }}" data-logistics-id="{{ logistic.key.integer_id() }}"><span class="glyphicon glyphicon-trash"></span></button>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if logistic.logistics_type == "crowdsourcing" %}
+        <div class="panel panel-default" data-type="{{ logistic.logistics_type|capitalize }}">
+            <div class="panel-heading">
+                <h3 class="panel-title">Crowdsourcing</h3>
+            </div>
+            <div class="panel-body logisticsShown">
+                {{ logistic.logistics_notes }}
+            </div>
+            <ul class="list-group logisticsShown">
+                {% for item in logistic.logistics_items %}
+                <li class="list-group-item">
+                    {{ item.item_item }}
+                    <div class="pull-right">
+                        {% if item.item_id != None %}
+                        <span class="text-muted">
+                        {% for user in users_list %}
+                            {% if user.user_id == item.item_id %}
+                            <img src="{{ user.user_public_profile_photo_url }}" class="img-profile">
+                            <a href="{{ user.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                            {% endif %}
+                        {% endfor %}</span>
+                        {% endif %}
+                        {% for guest in event.event_guests %}
+                            {% if guest.guest_id == user_entity.user_id %}
+                                {% if item.item_id == None or user_entity.user_id == item.item_id %}
+                                &nbsp;<button class="btn btn-success btn-xs bringItem{% if item.item_id == user_entity.user_id %} active{% endif %}" data-toggle="button" data-id="{{ event.key.integer_id() }}" data-logistics-id="{{ logistic.key.integer_id() }}" data-time="{{ item.item_time }}"><span class="glyphicon glyphicon-ok"></span></button>
+                                {% else %}
+                                &nbsp;
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        <button class="btn btn-danger btn-xs deleteItem" data-id="{{ event.key.integer_id() }}" data-logistics-id="{{ logistic.key.integer_id() }}" data-time="{{ item.item_time }}"><span class="glyphicon glyphicon-trash"></span></button>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="panel-body logisticsShown">
+                <form method="post">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="inputItem" placeholder="Item" name="item_item" required>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary addItem" data-id="{{ event.key.integer_id() }}" data-logistics-id="{{ logistic.key.integer_id() }}"><span class="glyphicon glyphicon-plus"></span> Add Item</button>
+                    </div>
+                </form>
+            </div>
+            {% for guest in event.event_guests %}
+                {% if guest.guest_id == user_entity.user_id and guest.guest_permissions == "admin" %}
+                <div class="panel-body editLogisticsForm">
+                    <form class="form-horizontal" data-logistics-type="{{ logistic.logistics_type }}">
+                        <div class="form-group">
+                            <label for="inputLogisticsNotes" class="col-xs-3 col-sm-2 control-label">Logistics Notes:</label>
+                            <div class="col-xs-9 col-sm-10">
+                                <textarea class="form-control wysihtml5 editLogisticsNotes" id="inputLogisticsNotes" rows="10" placeholder="Notes for Logistics" name="logistics_notes">{{ logistic.logistics_notes }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-3 visible-xs"></div>
+                            <div class="col-xs-9 col-sm-10 col-sm-offset-2">
+                                <button type="button" class="btn btn-primary submitEditLogistics" data-id="{{ event.key.integer_id() }}" data-logistics-id="{{ logistic.key.integer_id() }}"><span class="glyphicon glyphicon-edit"></span> Edit Logistics</button>
+                                <button type="button" class="btn btn-default cancelEditLogistics"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+            {% endfor %}
+            {% for guest in event.event_guests %}
+                {% if guest.guest_id == user_entity.user_id and guest.guest_permissions == "admin" %}
+                    <div class="panel-footer text-right">
+                        <button class="btn btn-primary editLogistics" data-id="{{ event.key.integer_id() }}" data-logistics-id="{{ logistic.key.integer_id() }}"><span class="glyphicon glyphicon-edit"></span></button>
+                        <button class="btn btn-danger deleteLogistics" data-id="{{ event.key.integer_id() }}" data-logistics-id="{{ logistic.key.integer_id() }}"><span class="glyphicon glyphicon-trash"></span></button>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endfor %}
+    {% for guest in event.event_guests %}
+        {% if guest.guest_id == user_entity.user_id and guest.guest_permissions == "admin" %}
+        <div class="panel panel-default add">
+            <div class="panel-body addLogisticsArea">
+                <form method="post" action="/addLogistics">
+                    <div class="form-group">
+                        <select name="logistics_type" class="form-control" id="inputLogisticsType">
+                            <option value="crowdfunding">Crowdfunding</option>
+                            <option value="crowdsourcing">Crowdsourcing</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-usd"></span></span>
+                            <input type="number" class="form-control" name="logistics_goal" placeholder="10" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control wysihtml5 addLogisticsNotes" rows="10" name="logistics_notes" placeholder="Notes"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary addLogistics" type="button" data-id="{{ event.key.integer_id() }}"><span class="glyphicon glyphicon-plus"></span> Add Logistics</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

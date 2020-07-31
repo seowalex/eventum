@@ -1,0 +1,107 @@
+{% extends "/templates/_event.html" %}
+{% block event %}
+    <ol class="breadcrumb">
+        <li><a href="/forum?id={{ event.key.integer_id() }}">Forum</a></li>
+        <li class="active">Index</li>
+    </ol>
+
+    <button class="btn btn-primary gotoAdd"><span class="glyphicon glyphicon-chevron-down"></span> Go to Add Thread</button>
+    <br>
+    <br>
+
+    <div class="table-responsive">
+        <table class="table">
+            <tbody>
+                {% for thread in forum %}
+                {% if thread.thread_pinned == True %}
+                    <tr class="active{% if thread.thread_locked == True %} text-muted{% endif %}">
+                {% else %}
+                    <tr{% if thread.thread_locked == True %} class="text-muted"{% endif %}>
+                {% endif %}
+                    <td class="text-center">
+                    {% if thread.thread_locked == False %}
+                        {% if thread.thread_pinned == True %}
+                        <span class="glyphicon glyphicon-pushpin glyphicon-lg"></span>
+                        {% else %}
+                        <span class="glyphicon glyphicon-comment glyphicon-lg"></span>
+                        {% endif %}
+                    {% else %}
+                    <span class="glyphicon glyphicon-lock glyphicon-lg"></span>
+                    {% endif %}
+                    </td>
+                    <td class="col-xs-5 col-sm-4 col-md-6">
+                        {% if thread.thread_pinned == True %}
+                        <strong><a href="/thread?id={{ event.key.integer_id() }}&thread_id={{ thread.key.integer_id() }}" class="forum-title">{{ thread.thread_title }}</a></strong>
+                        {% else %}
+                        <a href="/thread?id={{ event.key.integer_id() }}&thread_id={{ thread.key.integer_id() }}" class="forum-title">{{ thread.thread_title }}</a>
+                        {% endif %}
+                        <br>
+                        Started by
+                        {% for user in users_list %}
+                            {% if user.user_id == thread.thread_author %}
+                                <a href="{{ user_entity.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                            {% endif %}
+                        {% endfor %}
+                        <a href="#" class="time">{{ thread.thread_started }}</a>
+                    </td>
+                    <td class="col-xs-2 col-sm-3 col-md-2 text-right">
+                        {% for guest in event.event_guests %}
+                            {% if guest.guest_id == user_entity.user_id %}
+                                {% if guest.guest_permissions == "admin" %}
+                                    <button class="btn btn-default lockThread{% if thread.thread_locked == True %} active{% endif %}" data-toggle="button" data-id="{{ event.key.integer_id() }}" data-thread-id="{{ thread.key.integer_id() }}" data-name="{{ thread.thread_title }}"><span class="glyphicon glyphicon-lock"></span></button>
+                                    <button class="btn btn-default pinThread{% if thread.thread_pinned == True %} active{% endif %}" data-toggle="button" data-id="{{ event.key.integer_id() }}" data-thread-id="{{ thread.key.integer_id() }}" data-name="{{ thread.thread_title }}"{% if thread.thread_locked == True %} disabled{% endif %}><span class="glyphicon glyphicon-pushpin"></span></button>
+                                    <button class="btn btn-danger deleteThread" data-id="{{ event.key.integer_id() }}" data-thread-id="{{ thread.key.integer_id() }}" data-name="{{ thread.thread_title }}"{% if thread.thread_locked == True %} disabled{% endif %}><span class="glyphicon glyphicon-trash"></span></button>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td class="col-xs-1 col-sm-2 col-md-1 text-right">
+                        {{ thread.thread_posts|length }} replies<br>{{ thread.thread_views }} views
+                    </td>
+                    <td class="col-xs-1 text-right">
+                        {% if thread.thread_posts %}
+                            {% for user in users_list %}
+                                {% if user.user_id == (thread.thread_posts|last).post_author %}
+                                    <img src="{{ user.user_public_profile_photo_url }}" class="img-profile img-thread">
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                    <td class="col-xs-3 col-sm-2">
+                        {% if thread.thread_posts %}
+                            {% for user in users_list %}
+                                {% if user.user_id == (thread.thread_posts|last).post_author %}
+                                    <a href="{{ user.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                                {% endif %}
+                            {% endfor %}
+                            <br>
+                            <a href="#" class="time">{{ (thread.thread_posts|last).post_time }}</a>
+                        {% else %}
+                        <span class="text-muted">No posts</span>
+                        {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel panel-default add">
+        <div class="panel-body addThreadArea">
+            <form method="post" action="/addPost">
+                <div class="row">
+                    <div class="form-group col-sm-5 col-md-4 col-lg-3">
+                        <input type="text" class="form-control" name="thread_title" placeholder="Title" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control wysihtml5" rows="10" name="thread_content" required></textarea>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary addThread" type="button" data-id="{{ event.key.integer_id() }}"><span class="glyphicon glyphicon-plus"></span> Add Thread</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

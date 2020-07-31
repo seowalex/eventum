@@ -1,0 +1,121 @@
+{% extends "/templates/_event.html" %}
+{% block event %}
+    {% for guest in event.event_guests %}
+        {% if guest.guest_id == user_entity.user_id and guest.guest_permissions == "admin" %}
+        <button class="btn btn-primary gotoAdd"><span class="glyphicon glyphicon-chevron-down"></span> Go to Add Date</button>
+        <br>
+        <br>
+        {% endif %}
+    {% endfor %}
+
+    {% for date in dates|sort(attribute="date_datetime_start") %}
+    <div class="panel panel-default">
+        <div class="panel-body dateShown">
+            <div class="text-center col-xs-12 col-sm-5">
+                <div class="large-text parseTime">{{ date.date_datetime_start }}</div>
+                <div class="parseDate">{{ date.date_datetime_start }}</div>
+            </div>
+            <br class="visible-xs">
+            <div class="large-text text-center col-xs-12 col-sm-2"><span class="glyphicon glyphicon-forward"></span></div>
+            <br class="visible-xs">
+            <div class="text-center col-xs-12 col-sm-5">
+                <div class="large-text parseTime">{{ date.date_datetime_end }}</div>
+                <div class="parseDate">{{ date.date_datetime_end }}</div>
+            </div>
+        </div>
+        <table class="table dateVotes">
+            <tbody>
+            {% for vote in date.date_votes %}
+                {% for guest in event.event_guests %}
+                    {% for user in users_list %}
+                        {% if user.user_id == guest.guest_id and vote.date_vote_id == guest.guest_id %}
+                        <tr data-id="{{ user.user_id }}">
+                            <td class="col-xs-8">
+                                <img src="{{ user_entity.user_public_profile_photo_url }}" class="img-profile">
+                                <a href="{{ user_entity.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                            </td>
+                            <td class="col-xs-4 text-right">
+                                {% if vote.date_vote_value == "available" %}
+                                <span class="text-success">Available</span>
+                                {% endif %}
+                                {% if vote.date_vote_value == "maybe" %}
+                                <span class="text-warning">Maybe</span>
+                                {% endif %}
+                                {% if vote.date_vote_value == "notavailable" %}
+                                <span class="text-danger">Not Available</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="panel-body dateVotes">
+            <button type="button" class="btn btn-default cancelViewDate"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+        </div>
+        <div class="panel-footer">
+            <div class="row">
+                <div class="col-xs-7 col-sm-10">
+                    <div class="btn-group" data-toggle="buttons" data-date-id="{{ date.key.integer_id() }}">
+                        <label class="btn btn-default available col-xs-hide{% for vote in date.date_votes %}{% if vote.date_vote_id == user_entity.user_id and vote.date_vote_value == 'available' %} active{% endif %}{% endfor %}">
+                            <input type="radio" name="availability" value="available"{% for vote in date.date_votes %}{% if vote.date_vote_id == user_entity.user_id and vote.date_vote_value == "available" %} checked{% endif %}{% endfor %}>
+                            <span class="glyphicon glyphicon-ok"></span>
+                            <span> Available</span>
+                        </label>
+                        <label class="btn btn-default maybeavailable col-xs-hide{% for vote in date.date_votes %}{% if vote.date_vote_id == user_entity.user_id and vote.date_vote_value == 'maybe' %} active{% endif %}{% endfor %}">
+                            <input type="radio" name="availability" value="maybe"{% for vote in date.date_votes %}{% if vote.date_vote_id == user_entity.user_id and vote.date_vote_value == "maybe" %} checked{% endif %}{% endfor %}>
+                            <span class="glyphicon glyphicon-adjust"></span>
+                            <span> Maybe</span>
+                        </label>
+                        <label class="btn btn-default notavailable col-xs-hide{% for vote in date.date_votes %}{% if vote.date_vote_id == user_entity.user_id and vote.date_vote_value == 'notavailable' %} active{% endif %}{% endfor %}">
+                            <input type="radio" name="availability" value="notavailable"{% for vote in date.date_votes %}{% if vote.date_vote_id == user_entity.user_id and vote.date_vote_value == "notavailable" %} checked{% endif %}{% endfor %}>
+                            <span class="glyphicon glyphicon-remove"></span>
+                            <span> Not Available</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-xs-5 col-sm-2 text-right">
+                    {% for guest in event.event_guests %}
+                        {% if guest.guest_id == user_entity.user_id and guest.guest_permissions == "admin" %}
+                        <button class="btn btn-success confirmDate" data-id="{{ event.key.integer_id() }}" data-date-id="{{ date.key.integer_id() }}"><span class="glyphicon glyphicon-ok"></span></button>
+                        <button type="button" class="btn btn-primary viewDate" data-id="{{ event.key.integer_id() }}" data-date-id="{{ date.key.integer_id() }}"><span class="glyphicon glyphicon-eye-open"></span></button>
+                        <button type="button" class="btn btn-danger deleteDate" data-id="{{ event.key.integer_id() }}" data-date-id="{{ date.key.integer_id() }}"><span class="glyphicon glyphicon-trash"></span></button>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% for guest in event.event_guests %}
+        {% if guest.guest_id == user_entity.user_id and guest.guest_permissions == "admin" %}
+        <div class="panel panel-default add">
+            <div class="panel-body addDateArea">
+                <form method="post" action="/addDate">
+                    <div class="row linkeddatetimepicker">
+                        <div class="form-group col-xs-12 col-sm-6">
+                            <div class="input-group date">
+                                <input type="text" class="form-control" placeholder="Starting Date & Time" name="event_datetime_start" required>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                            </div>
+                        </div>
+                        <div class="form-group col-xs-12 col-sm-6">
+                            <div class="input-group date">
+                                <input type="text" class="form-control" placeholder="Ending Date & Time" name="event_datetime_end" required>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-xs-12">
+                            <button class="btn btn-primary addDate" type="button" data-id="{{ event.key.integer_id() }}"><span class="glyphicon glyphicon-plus"></span> Add Date</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}

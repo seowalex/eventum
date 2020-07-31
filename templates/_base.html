@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="google-signin-clientid" content="{{ CLIENT_ID }}">
+        <meta name="google-signin-scope" content="https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/plus.profile.emails.read">
+        <meta name="google-signin-requestvisibleactions" content="http://schemas.google.com/AddActivity">
+        <meta name="google-signin-cookiepolicy" content="single_host_origin">
+        <meta name="google-signin-callback" content="onSignInCallback">
+        <title>{% block title %}{% endblock %}</title>
+
+        <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+        <link href="/static/css/font-awesome.min.css" rel="stylesheet">
+        <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/static/css/bootstrap3-wysihtml5.min.css" rel="stylesheet">
+        <link href="/static/css/bootstrap-select.min.css" rel="stylesheet">
+        <link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+        <link href="/static/css/jquery.pnotify.default.css" rel="stylesheet">
+        <link href="/static/css/tagmanager.css" rel="stylesheet">
+        <link href="/static/css/jquery-ui-1.10.3.custom.css" rel="stylesheet">
+        <link href="/static/css/app.css" rel="stylesheet">
+
+        <script>
+            (function() {
+                var po = document.createElement("script");
+                po.type = "text/javascript";
+                po.async = true;
+                po.src = "https://plus.google.com/js/client:plusone.js?onload=render";
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(po, s);
+            })();
+
+            function render() {
+                var additionalParams = {
+                    "theme" : "dark"
+                };
+
+                gapi.signin.render("gpluslogin", additionalParams);
+            }
+        </script>
+
+        <script src="/static/js/gplus.js"></script>
+
+        <script>
+            var gplus_object=gplus();
+            var global_hidden_key="{{ HIDDEN_KEY }}";
+
+            function onSignInCallback(authResult){
+                if (authResult.status.signed_in == true) {
+                    bootbox.dialog({
+                        title: "<span class='glyphicon glyphicon-refresh'></span> Loading, please wait",
+                        message: "<div class='progress progress-striped active'><div class='progress-bar' role='progressbar' style='width: 100%'></div></div>"
+                    });
+                }
+
+                gplus_object.onSignInCallback(authResult);
+            }
+        </script>
+
+        <script src="https://apis.google.com/js/platform.js"></script>
+    </head>
+
+    <body>
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand brand" href="/"><img class="img-navbar-brand" src="/static/img/airship.png"> Eventum</a>
+                </div>
+                <div class="collapse navbar-collapse navbar-main-collapse">
+                    {% if user_entity %}
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle user" data-toggle="dropdown" data-id="{{ user_entity.user_id }}" data-name="{{ user_entity.user_name }}" data-public-profile-url="{{ user_entity.user_public_profile_url }}" data-public-profile-photo-url="{{ user_entity.user_public_profile_photo_url }}"><img src="{{ user_entity.user_public_profile_photo_url }}" class="img-profile"> {{ user_entity.user_name }} <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/profile"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
+                                <li class="divider"></li>
+                                <li><a href="{{ logout_url }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    {% else %}
+                    <button class="btn btn-danger navbar-btn navbar-right" id="gpluslogin"><i class="fa fa-google-plus fa-lg"></i> Google+ Sign in</button>
+                    {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        {% block content %}
+        {% endblock %}
+
+        <script src="/static/js/jquery-2.0.3.min.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+        <script src="/static/js/bootstrap3-wysihtml5.all.min.js"></script>
+        <script src="/static/js/bootbox.js"></script>
+        <script src="/static/js/moment.min.js"></script>
+        <script src="/static/js/bootstrap-select.min.js"></script>
+        <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
+        <script src="/static/js/jquery.pnotify.min.js"></script>
+        <script src="/static/js/tagmanager.js"></script>
+        <script src="/static/js/jquery-ui-1.10.3.custom.min.js"></script>
+        <script src="https://maps.google.com/maps/api/js?sensor=false"></script>
+        <script src="/static/js/gmaps.js"></script>
+        <script src="/static/js/showmap.js"></script>
+        <script src="/static/js/app.js"></script>
+    </body>
+</html>

@@ -1,0 +1,108 @@
+body {
+	padding-top: 50px;
+    overflow-y: scroll;
+}
+
+.hidden-xs {
+    display: inline-block !important;
+}
+
+.brand {
+	font-family: "Pacifico", cursive;
+}
+
+.jumbotron .brand {
+    color: #1d3e71 !important;
+    font-size: 63px;
+}
+
+.jumbotron-brand {
+    background-image: url("/static/img/clouds.jpg");
+    background-size: cover;
+    background-position: center bottom;
+}
+
+.img-brand {
+    margin-bottom: -40px;
+    display: inline;
+}
+
+.img-navbar-brand {
+    max-width: 30px;
+}
+
+.navbar-hangout-btn {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.glyphicon-lg {
+    margin-top: 4px;
+    margin-left: 8px;
+    font-size: 24px;
+}
+
+.dropdown-right {
+    left: auto;
+    right: 0;
+}
+
+tr.text-muted a {
+    color: #999999;
+}
+
+td {
+    vertical-align: middle !important;
+}
+
+.voting {
+    margin: 0px;
+    font-size: 24px;
+}
+
+.vote {
+    margin: 0px 5px;
+}
+
+.large-text {
+    font-size: 48px;
+    line-height: 1.1;
+}
+
+.glyphicon-title {
+    font-size: 100px;
+    line-height: 1.5;
+}
+
+.forum-title {
+    margin: 0px;
+    font-size: 16px;
+}
+
+.event-title {
+    margin-top: 0px;
+}
+
+.img-profile {
+    width: 18px;
+}
+
+.img-thread {
+    width: 42px;
+}
+
+.wordwrap {
+    word-wrap: break-word;
+}
+
+.no-margin-top {
+    margin-top: 0px;
+}
+
+#gmaps-canvas, #gmaps-edit-canvas, .gmaps-canvas-location {
+    height: 300px;
+}
+
+#gpluslogin {
+    cursor: pointer;
+}

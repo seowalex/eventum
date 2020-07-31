@@ -1,0 +1,47 @@
+{% extends "/templates/_base.html" %}
+{% block title %}Eventum | Batch Email{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="page-header">
+            <h1><span class="glyphicon glyphicon-envelope"></span> Batch Email</h1>
+        </div>
+
+        <form class="form-horizontal" method="post">
+            <div class="form-group">
+                <label for="inputRecipients" class="col-xs-3 col-sm-2 control-label">Recipient Groups:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <select class="selectpicker" id="inputRecipients" name="email_recipients" data-width="100%" title="No group selected" multiple required>
+                        {% if status_count [0] > 0 %}
+                        <option value="going" data-subtext="{{ status_count[0] }}">Going</option>
+                        {% endif %}
+                        {% if status_count [1] > 0 %}
+                        <option value="maybe" data-subtext="{{ status_count[1] }}">Maybe</option>
+                        {% endif %}
+                        {% if status_count [2] > 0 %}
+                        <option value="notgoing" data-subtext="{{ status_count[2] }}">Not Going</option>
+                        {% endif %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputSubject" class="col-xs-3 col-sm-2 control-label">Subject:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <input class="form-control" id="inputSubject" placeholder="Subject of Email" name="email_subject" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputMessage" class="col-xs-3 col-sm-2 control-label">Message:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <textarea class="form-control wysihtml5" id="inputMessage" rows="10" placeholder="Message of Email" name="email_message" required></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="visible-xs col-xs-3"></div>
+                <div class="col-xs-9 col-sm-10 col-sm-offset-2">
+                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-envelope"></span> Send Email</button>
+                    <a href="/event?id={{ event.key.integer_id() }}" class="btn btn-default"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

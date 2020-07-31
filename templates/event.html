@@ -1,0 +1,280 @@
+{% extends "/templates/_event.html" %}
+{% block event %}
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Description</h3>
+                        </div>
+                        <div class="panel-body">
+                            {% if event.event_description != "" %}
+                                {{ event.event_description }}
+                            {% else %}
+                                <div class="text-muted">None</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                            {% if event.event_options.option_date_voting_enabled == True %}
+                                Dates & Times
+                            {% else %}
+                                Date & Time
+                            {% endif %}
+                            </h3>
+                        </div>
+                        {% if event.event_options.option_date_voting_enabled == False %}
+                        <div class="panel-body">
+                            <span class="eventDateTime">{{ event.event_datetime_start }}</span> to <span class="eventDateTime">{{ event.event_datetime_end }}</span>
+                        </div>
+                        {% else %}
+                        {% if dates.count() != 0 %}
+                        <table class="table">
+                            <tbody>
+                            {% for date in dates|sort(attribute="date_datetime_start") %}
+                                {% if loop.index <= 5 %}
+                                    <tr>
+                                        <td>
+                                            <span class="glyphicon glyphicon-calendar glyphicon-lg"></span>
+                                        </td>
+                                        <td class="col-xs-10">
+                                            <span class="eventDateTime">{{ date.date_datetime_start }}</span> to <span class="eventDateTime">{{ date.date_datetime_end }}</span>
+                                        </td>
+                                        <td class="col-xs-2 text-right voting">
+                                            {% for vote in date.date_votes %}
+                                                {% if loop.first %}
+                                                    {% set available = 0 %}
+                                                {% endif %}
+                                                {% if vote.date_vote_value == "available" %}
+                                                    {% set available = available + 1 %}
+                                                {% endif %}
+                                                {% if loop.last %}
+                                                    {{ available }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        {% if dates.count() > 5 %}
+                            <div class="panel-footer"><a href="/date?id={{ event.key.integer_id() }}">See more...</a></div>
+                        {% endif %}
+                        {% else %}
+                        <div class="panel-body text-muted">No dates</div>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                        <h3 class="panel-title">Guests <span class="status_count pull-right">{{ event.event_guests|length }}</span></h3>
+                        </div>
+                        <ul class="list-group guests">
+                            {% for guest in event.event_guests %}
+                                {% if loop.first %}
+                                    {% set index = 0 %}
+                                {% endif %}
+                                {% if guest.guest_status == "going" and index < 2 %}
+                                    {% set index = index + 1 %}
+                                    {% for user in users_list %}
+                                        {% if user.user_id == guest.guest_id %}
+                                        <li class="list-group-item" data-id="{{ user.user_id }}">
+                                            <img src="{{ user_entity.user_public_profile_photo_url }}" class="img-profile">
+                                            <a href="{{ user_entity.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                                            <span class="pull-right text-success status">Going</span>
+                                        </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                            {% for guest in event.event_guests %}
+                                {% if loop.first %}
+                                    {% set index = 0 %}
+                                {% endif %}
+                                {% if guest.guest_status == "maybe" and index < 2 %}
+                                    {% set index = index + 1 %}
+                                    {% for user in users_list %}
+                                        {% if user.user_id == guest.guest_id %}
+                                        <li class="list-group-item" data-id="{{ user.user_id }}">
+                                            <img src="{{ user.user_public_profile_photo_url }}" class="img-profile">
+                                            <a href="{{ user.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                                            <span class="pull-right text-warning status">Maybe</span>
+                                        </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                            {% for guest in event.event_guests %}
+                                {% if loop.first %}
+                                    {% set index = 0 %}
+                                {% endif %}
+                                {% if guest.guest_status == "notgoing" and index < 2 %}
+                                    {% set index = index + 1 %}
+                                    {% for user in users_list %}
+                                        {% if user["user_id"] == guest.guest_id %}
+                                        <li class="list-group-item" data-id="{{ user.user_id }}">
+                                            <img src="{{ user_entity.user_public_profile_photo_url }}" class="img-profile">
+                                            <a href="{{ user_entity.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                                            <span class="pull-right text-danger status">Not Going</span>
+                                        </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        {% if status_count[0] > 2 or status_count[1] > 2 or status_count[2] > 2 %}
+                            <div class="panel-footer"><a href="/date?id={{ event.key.integer_id() }}">See more...</a></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Forum</h3>
+                        </div>
+                        {% if forum.count() != 0 %}
+                        <table class="table">
+                            <tbody>
+                            {% for thread in forum %}
+                                {% if loop.index <= 5 %}
+                                    {% if thread.thread_pinned == True %}
+                                    <tr class="active{% if thread.thread_locked == True %} text-muted{% endif %}">
+                                    {% else %}
+                                    <tr{% if thread.thread_locked == True %} class="text-muted"{% endif %}>
+                                    {% endif %}
+                                        <td class="text-center">
+                                        {% if thread.thread_locked == False %}
+                                            {% if thread.thread_pinned == True %}
+                                            <span class="glyphicon glyphicon-pushpin glyphicon-lg"></span>
+                                            {% else %}
+                                            <span class="glyphicon glyphicon-comment glyphicon-lg"></span>
+                                            {% endif %}
+                                        {% else %}
+                                        <span class="glyphicon glyphicon-lock glyphicon-lg"></span>
+                                        {% endif %}
+                                        </td>
+                                        <td class="col-xs-6">
+                                            {% if thread.thread_pinned == True %}
+                                            <strong><a href="/thread?id={{ event.key.integer_id() }}&thread_id={{ thread.key.integer_id() }}" class="forum-title">{{ thread.thread_title }}</a></strong>
+                                            {% else %}<a href="/thread?id={{ event.key.integer_id() }}&thread_id={{ thread.key.integer_id() }}" class="forum-title">{{ thread.thread_title }}</a>
+                                            {% endif %}
+                                            <br>
+                                            Started by
+                                            {% for user in users_list %}
+                                                {% if user.user_id == thread.thread_author %}
+                                                    <a href="{{ user_entity.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                                                {% endif %}
+                                            {% endfor %}
+                                            <a href="#" class="time">{{ thread.thread_started }}</a>
+                                        </td>
+                                        <td class="col-xs-2 text-right">
+                                            {{ thread.thread_posts|length }} replies<br>{{ thread.thread_views }} views
+                                        </td>
+                                        <td class="col-xs-1 text-right">
+                                            {% if thread.thread_posts %}
+                                                {% for user in users_list %}
+                                                    {% if user.user_id == (thread.thread_posts|last).post_author %}
+                                                        <img src="{{ user.user_public_profile_photo_url }}" class="img-profile img-thread">
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        <td class="col-xs-3">
+                                            {% if thread.thread_posts %}
+                                                {% for user in users_list %}
+                                                    {% if user.user_id == (thread.thread_posts|last).post_author %}
+                                                        <a href="{{ user.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <br>
+                                                <a href="#" class="time">{{ (thread.thread_posts|last).post_time }}</a>
+                                            {% else %}
+                                            <span class="text-muted">No posts</span>
+                                            {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        {% if forum.count() > 5 %}
+                            <div class="panel-footer"><a href="/forum?id={{ event.key.integer_id() }}">See more...</a></div>
+                        {% endif %}
+                        {% else %}
+                        <div class="panel-body text-muted">No forum posts</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                            {% if event.event_options.option_location_type == "voting" %}
+                                Locations
+                            {% else %}
+                                Location
+                            {% endif %}
+                            </h3>
+                        </div>
+                        {% if event.event_options.option_location_type == "fixed" %}
+                            <div class="panel-body">
+                            {% for location in locations %}
+                                {% if location.location_is_master == True %}
+                                <h2 class="no-margin-top">{{ location.location_name  }} <small>{{ location.location_address  }}</small></h2>
+                                <div>{{ location.location_notes  }}</div>
+                                <br>
+                                <div class="row">
+                                    <div class="gmaps-canvas-location col-xs-12" id="canvas-location-{{ location_id }}" data-lat="{{ location.location_coordinate.lat }}" data-lon="{{ location.location_coordinate.lon }}"></div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                            </div>
+                        {% endif %}
+                        {% if event.event_options.option_location_type == "voting" %}
+                            {% if locations.count() != 0 %}
+                            <table class="table">
+                                <tbody>
+                                {% for location in locations|sort(attribute="location_vote_count", reverse=True) %}
+                                    {% if loop.index <= 5 %}
+                                    <tr>
+                                        <td><span class="glyphicon glyphicon-map-marker glyphicon-lg"></span></td>
+                                        <td class="col-xs-11"><strong>{{ location.location_name }}</strong><br>{{ location.location_address }}</td>
+                                        <td class="col-xs-1 text-center voting{% if location.location_vote_count < 0 %} text-danger{% endif %}{% if location.location_vote_count > 0 %} text-success{% endif %}">{{ location.location_vote_count }}</td>
+                                    </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            {% if locations.count() > 5 %}
+                                <div class="panel-footer"><a href="/location?id={{ event.key.integer_id() }}">See more...</a></div>
+                            {% endif %}
+                            {% else %}
+                            <div class="panel-body text-muted">No locations</div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

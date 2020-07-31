@@ -1,0 +1,12 @@
+{% extends "/templates/_base.html" %}
+{% block title %}Eventum | Error{% endblock %}
+{% block content %}
+    <div class="jumbotron">
+        <div class="container text-center">
+            <h1>404: Page not Found</h1>
+            <p><a href="{{ path }}">{{ path }}</a> could not be found.</p>
+            <p>Try typing the address again or use the friendly button below to return home.</p>
+            <a href="/" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-home"></span> Go Home</a>
+        </div>
+    </div>
+{% endblock %}

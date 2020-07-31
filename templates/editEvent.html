@@ -1,0 +1,137 @@
+{% extends "/templates/_base.html" %}
+{% block title %}Eventum | Edit Event{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="page-header">
+            <h1><span class="glyphicon glyphicon-edit"></span> Edit Event</h1>
+        </div>
+
+        <form class="form-horizontal" method="post">
+            <div class="form-group">
+                <label for="inputName" class="col-xs-3 col-sm-2 control-label">Name:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <input type="text" class="form-control" id="inputName" value="{{ event.event_name }}" placeholder="Name of Event" name="event_name" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputDescription" class="col-xs-3 col-sm-2 control-label">Description:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <textarea class="form-control wysihtml5" id="inputDescription" rows="10" placeholder="Description of Event" name="event_description">{{ event.event_description }}</textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputDateVoting" class="col-xs-3 col-sm-2 control-label">Date Voting:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <div class="btn-group" id="inputDateVoting" data-toggle="buttons">
+                        <label class="btn btn-default{% if event.event_options.option_date_voting_enabled == True %} active{% endif %}">
+                            <input type="radio" name="date_voting_enabled" value="True"{% if event.event_options.option_date_voting_enabled == True %} checked{% endif %}><span class="glyphicon glyphicon-ok"></span> Enable
+                        </label>
+                        <label class="btn btn-default{% if event.event_options.option_date_voting_enabled == False %} active{% endif %}">
+                            <input type="radio" name="date_voting_enabled" value="False"{% if event.event_options.option_date_voting_enabled == False %} checked{% endif %}><span class="glyphicon glyphicon-remove"></span> Disable
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="well dateOptions row linkeddatetimepicker">
+                <div class="form-group col-xs-12 col-sm-6">
+                    <label for="inputStartingtDateTime" class="col-xs-3 col-sm-4 control-label">Starting Date & Time:</label>
+                    <div class="col-xs-9 col-sm-8">
+                        <div class="input-group date" data-value="{{ event.event_datetime_start }}">
+                            <input type="text" class="form-control" id="inputStartingtDateTime" placeholder="12/12/2012 12:12 AM" name="event_datetime_start">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-xs-12 col-sm-6">
+                    <label for="inputEndingDateTime" class="col-xs-3 col-sm-4 control-label">Ending Date & Time:</label>
+                    <div class="col-xs-9 col-sm-8">
+                        <div class="input-group date" data-value="{{ event.event_datetime_end }}">
+                            <input type="text" class="form-control" id="inputEndingDateTime" placeholder="12/12/2012 12:12 AM" name="event_datetime_end">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputAdmins" class="col-xs-3 col-sm-2 control-label">Admins:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <select class="selectpicker" id="inputAdmins" name="event_admins" data-width="100%" data-live-search="true" multiple>
+                        {% for guest in event.event_guests %}
+                            <option value="{{ guest.guest_id }}"{% for user in users_list %}{% if user.user_id == guest.guest_id %} data-content="<img src='{{ user.user_public_profile_photo_url }}' class='img-profile'> {{ user.user_name }}"{% endif %}{% endfor %}{% if guest.guest_permissions == "admin" %} selected{% endif %}{% if guest.guest_id == user_entity.user_id %} disabled="disabled"{% endif %}>{% for user in users_list %}{% if user.user_id == guest.guest_id %}{{ user.user_name }}{% endif %}{% endfor %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputForum" class="col-xs-3 col-sm-2 control-label">Forum:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <div class="btn-group" id="inputForum" data-toggle="buttons">
+                        <label class="btn btn-default{% if event.event_options.option_forum_enabled == True %} active{% endif %}">
+                            <input type="radio" name="forum_enabled" value="True"{% if event.event_options.option_forum_enabled == True %} checked{% endif %}><span class="glyphicon glyphicon-ok"></span> Enable
+                        </label>
+                        <label class="btn btn-default{% if event.event_options.option_forum_enabled == False %} active{% endif %}">
+                            <input type="radio" name="forum_enabled" value="False"{% if event.event_options.option_forum_enabled == False %} checked{% endif %}><span class="glyphicon glyphicon-remove"></span> Disable
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputLogistics" class="col-xs-3 col-sm-2 control-label">Logistics:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <div class="btn-group" id="inputLogistics" data-toggle="buttons">
+                        <label class="btn btn-default{% if event.event_options.option_logistics_enabled == True %} active{% endif %}">
+                            <input type="radio" name="logistics_enabled" value="True"{% if event.event_options.option_logistics_enabled == True %} checked{% endif %}><span class="glyphicon glyphicon-ok"></span> Enable
+                        </label>
+                        <label class="btn btn-default{% if event.event_options.option_logistics_enabled == False %} active{% endif %}">
+                            <input type="radio" name="logistics_enabled" value="False"{% if event.event_options.option_logistics_enabled == False %} checked{% endif %}><span class="glyphicon glyphicon-remove"></span> Disable
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputLocation" class="col-xs-3 col-sm-2 control-label">Location Type:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <select name="location_type" class="selectpicker show-tick" id="inputLocation" data-width="100%">
+                        <option value="voting"{% if event.event_options.option_location_type == "voting" %} selected{% endif %}>Through Voting</option>
+                        <option value="fixed"{% if event.event_options.option_location_type == "fixed" %} selected{% endif %}>Fixed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="well locationOptions">
+                <div class="form-group">
+                    <label for="inputLocationName" class="col-xs-3 col-sm-2 control-label">Location Name:</label>
+                    <div class="col-xs-9 col-sm-10">
+                        <input type="text" class="form-control" id="inputLocationName" placeholder="Name of Location" name="location_name" value="{% for location in locations %}{% if location.location_is_master == True %}{{ location.location_name }}{% endif %}{% endfor %}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="gmaps-input-address" class="col-xs-3 col-sm-2 control-label">Location Address:</label>
+                    <div class="col-xs-9 col-sm-10">
+                        <input type="text" class="form-control" id="gmaps-input-address" placeholder="Address of Location" name="location_address" value="{% for location in locations %}{% if location.location_is_master == True %}{{ location.location_address }}{% endif %}{% endfor %}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div id="gmaps-edit-canvas"></div>
+                </div>
+                <div class="hide">
+                    <input type="text" class="form-control" name="location_lat"  id="add_location_lat" value="{% if location.location_coordinate %}{{ location.location_coordinate.lat }}{% endif %}">
+                    <input type="text" class="form-control" name="location_long" id="add_location_long" value="{% if location.location_coordinate %}{{ location.location_coordinate.lon }}{% endif %}">
+                </div>
+                <div class="form-group">
+                    <label for="inputLocationNotes" class="col-xs-3 col-sm-2 control-label">Location Notes:</label>
+                    <div class="col-xs-9 col-sm-10">
+                        <textarea class="form-control wysihtml5" id="inputLocationNotes" rows="10" placeholder="Notes for Location" name="location_notes">{% for location in locations %}{% if location.location_is_master == True %}{{ location.location_notes }}{% endif %}{% endfor %}</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="visible-xs col-xs-3"></div>
+                <div class="col-xs-9 col-sm-10 col-sm-offset-2">
+                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span> Save Changes</button>
+                    <a href="/event?id={{ event.key.integer_id() }}" class="btn btn-default"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

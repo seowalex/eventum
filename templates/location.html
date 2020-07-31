@@ -1,0 +1,115 @@
+{% extends "/templates/_event.html" %}
+{% block event %}
+    <button class="btn btn-primary gotoAdd"><span class="glyphicon glyphicon-chevron-down"></span> Go to Add Location</button>
+    <br>
+    <br>
+
+    {% set location_id = 0 %}
+    {% for location in locations|sort(attribute="location_vote_count", reverse=True) %}
+    {% set location_id = location_id + 1 %}
+    <div class="panel panel-default" data-name="{{ location.location_name }}">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                {{ location.location_name }}
+                <span class="text-muted">({{ location.location_address }})</span>
+                <span class="text-muted pull-right">
+                    {% for user in users_list %}
+                        {% if user.user_id == location.location_author %}
+                            <img src="{{ user.user_public_profile_photo_url }}" class="img-profile">
+                            <a href="{{ user.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </span>
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div class="locationShown row">
+                <div class="col-xs-12">
+                    {{ location.location_notes }}
+                </div>
+                <br>
+                <br>
+                <div class="gmaps-canvas-location col-xs-12" id="canvas-location-{{ location_id }}" data-lat="{{ location.location_coordinate.lat }}" data-lon="{{ location.location_coordinate.lon }}"></div>
+            </div>
+            <form class="form-horizontal editLocationForm">
+                <div class="form-group">
+                    <label for="inputLocationName" class="col-xs-3 col-sm-2 control-label">Location Name:</label>
+                    <div class="col-xs-9 col-sm-10">
+                        <input type="text" class="form-control" id="inputLocationName" placeholder="Name of Location" name="location_name" value="{{ location.location_name }}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="inputLocationNotes" class="col-xs-3 col-sm-2 control-label">Location Notes:</label>
+                    <div class="col-xs-9 col-sm-10">
+                        <textarea class="form-control wysihtml5 editLocationNotes" id="inputLocationNotes" rows="10" placeholder="Notes for Location" name="location_notes">{{ location.location_notes }}</textarea>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-3 visible-xs"></div>
+                    <div class="col-xs-9 col-sm-10 col-sm-offset-2">
+                        <button type="button" class="btn btn-primary submitEditLocation" data-id="{{ event.key.integer_id() }}" data-location-id="{{ location.key.integer_id() }}"><span class="glyphicon glyphicon-edit"></span> Edit Location</button>
+                        <button type="button" class="btn btn-default cancelEditLocation"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {% for guest in event.event_guests %}
+            {% if guest.guest_id == user_entity.user_id %}
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-xs-6 col-sm-3 col-md-2">
+                        <span class="voting" data-id="{{ event.key.integer_id() }}" data-location-id="{{ location.key.integer_id() }}">
+                            <button class="btn btn-default upvoteLocation {% for vote in location.location_votes %}{% if vote.location_vote_id == user_entity.user_id and vote.location_vote_count == 1 %}active{% endif %}{% endfor %}" data-id="{{ event.key.integer_id() }}" data-location-id="{{ location.key.integer_id() }}"><span class="glyphicon glyphicon-chevron-up"></span></button>
+                            <span class="vote{% if location.location_vote_count < 0 %} text-danger{% endif %}{% if location.location_vote_count > 0 %} text-success{% endif %}">
+                                {{ location.location_vote_count }}
+                            </span>
+                            <button class="btn btn-default downvoteLocation {% for vote in location.location_votes %}{% if vote.location_vote_id == user_entity.user_id and vote.location_vote_count == -1 %}active{% endif %}{% endfor %}" data-id="{{ event.key.integer_id() }}" data-location-id="{{ location.key.integer_id() }}"><span class="glyphicon glyphicon-chevron-down"></span></button>
+                        </span>
+                    </div>
+                    <div class="col-xs-6 col-sm-3 col-lg-2 col-sm-offset-6 col-md-offset-7 col-lg-offset-8 text-right">
+                        {% for guest in event.event_guests %}
+                            {% if guest.guest_id == user_entity.user_id %}
+                                {% if guest.guest_permissions == "admin" %}
+                                <button class="btn btn-success confirmLocation" data-id="{{ event.key.integer_id() }}" data-location-id="{{ location.key.integer_id() }}" data-name="{{ location.location_name }}"><span class="glyphicon glyphicon-ok"></span></button>
+                                {% endif %}
+                                {% if guest.guest_id == location.location_author %}
+                                <button class="btn btn-primary editLocation" data-id="{{ event.key.integer_id() }}" data-location-id="{{ location.key.integer_id() }}"><span class="glyphicon glyphicon-edit"></span></button>
+                                {% endif %}
+                                {% if guest.guest_permissions == "admin" %}
+                                <button class="btn btn-danger deleteLocation" data-id="{{ event.key.integer_id() }}" data-location-id="{{ location.key.integer_id() }}" data-name="{{ location.location_name }}"><span class="glyphicon glyphicon-trash"></span></button>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endfor %}
+    <div class="panel panel-default add">
+        <div class="panel-body addLocationArea">
+            <form method="post" action="/addLocation">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="location_name" placeholder="Name of Location" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="gmaps-input-address" name="location_address" placeholder="Address of Location" required>
+                </div>
+                <div class="form-group">
+                    <div id="gmaps-canvas"></div>
+                </div>
+                <div class="hide">
+                    <input type="text" name="location_lat"  id="add_location_lat">
+                    <input type="text" name="location_long" id="add_location_long">
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control wysihtml5 addLocationNotes" rows="10" name="location_notes" placeholder="Notes for Location"></textarea>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary addLocation" type="button" data-id="{{ event.key.integer_id() }}"><span class="glyphicon glyphicon-plus"></span> Add Location</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "/templates/_event.html" %}
+{% block event %}
+    <ol class="breadcrumb">
+        <li><a href="/forum?id={{ event.key.integer_id() }}">Forum</a></li>
+        <li class="active">{{ thread.thread_title }}</li>
+    </ol>
+
+    <div class="page-header row thread" data-id="{{ thread.key.integer_id() }}">
+        <div class="col-xs-6 col-sm-9 col-md-6 col-lg-7">
+        {% if thread.thread_pinned == True %}
+            {% if thread.thread_locked == True %}
+            <h3><span class="glyphicon glyphicon-lock"></span> <span class="thread-title">{{ thread.thread_title }}</span> <small>This thread has been locked</small></h3>
+            {% else %}
+            <h3><span class="glyphicon glyphicon-pushpin"></span> <span class="thread-title">{{ thread.thread_title }}</span></h3>
+            {% endif %}
+        {% else %}
+            {% if thread.thread_locked == True %}
+            <h3><span class="glyphicon glyphicon-lock"></span> <span class="thread-title">{{ thread.thread_title }}</span> <small>This thread has been locked</small></h3>
+            {% else %}
+            <h3><span class="glyphicon glyphicon-comment"></span> <span class="thread-title">{{ thread.thread_title }}</span></h3>
+            {% endif %}
+        {% endif %}
+        </div>
+        <div class="col-xs-6 col-sm-3 col-md-6 col-lg-5 text-right vertical-align">
+        {% for guest in event.event_guests %}
+            {% if guest.guest_id == user_entity.user_id %}
+                {% if guest.guest_permissions == "admin" %}
+                    <span class="pull-right">
+                        <button class="btn btn-default lockThread col-xs-hide{% if thread.thread_locked == True %} active{% endif %}" data-toggle="button" data-id="{{ event.key.integer_id() }}" data-thread-id="{{ thread.key.integer_id() }}" data-name="{{ thread.thread_title }}"><span class="glyphicon glyphicon-lock"></span> <span>Lock Thread</span></button>
+                        <button class="btn btn-default pinThread col-xs-hide{% if thread.thread_pinned == True %} active{% endif %}" data-toggle="button" data-id="{{ event.key.integer_id() }}" data-thread-id="{{ thread.key.integer_id() }}" data-name="{{ thread.thread_title }}"{% if thread.thread_locked == True %} disabled{% endif %}><span class="glyphicon glyphicon-pushpin"></span> <span>Pin Thread</span></button>
+                        <button class="btn btn-danger deleteThread col-xs-hide" data-id="{{ event.key.integer_id() }}" data-thread-id="{{ thread.key.integer_id() }}" data-name="{{ thread.thread_title }}"{% if thread.thread_locked == True %} disabled{% endif %}><span class="glyphicon glyphicon-trash"></span> <span>Delete Thread</span></button>
+                    </span>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        </div>
+    </div>
+
+    <button class="btn btn-primary gotoAdd"{% if thread.thread_locked == True %} disabled{% endif %}><span class="glyphicon glyphicon-chevron-down"></span> Go to Add Post</button>
+    <br>
+    <br>
+
+    {% for post in thread.thread_posts %}
+    <div class="panel panel-default" data-post-time="{{ post.post_time }}">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                {% for user in users_list %}
+                    {% if user.user_id == post.post_author %}
+                    <img src="{{ user.user_public_profile_photo_url }}" class="img-profile">
+                    <a href="{{ user.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                    {% endif %}
+                {% endfor %}
+                <span class="text-muted pull-right">Posted <a href="#" class="time" data-time="{{ post.post_time }}">{{ post.post_time }}</a></span>
+            </h3>
+        </div>
+        <div class="panel-body">
+            <div class="post">{{ post.post_content }}</div>
+            {% for guest in event.event_guests %}
+                {% if guest.guest_id == user_entity.user_id and guest.guest_permissions == "admin" %}
+                <form class="form-horizontal editPostForm">
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <textarea class="form-control wysihtml5 editPost" rows="10" name="post_content">{{ post.post_content }}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <button type="button" class="btn btn-primary submitEditPost" data-id="{{ event.key.integer_id() }}" data-thread-id="{{ thread.key.integer_id() }}" data-post-time="{{ post.post_time }}"><span class="glyphicon glyphicon-edit"></span> Edit Post</button>
+                            <button type="button" class="btn btn-default cancelEditPost"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</button>
+                        </div>
+                    </div>
+                </form>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% for guest in event.event_guests %}
+            {% if guest.guest_id == user_entity.user_id and guest.guest_permissions == "admin" and post.post_first != True %}
+            <div class="panel-footer text-right">
+                <button class="btn btn-danger deletePost" data-id="{{ event.key.integer_id() }}" data-thread-id="{{ thread.key.integer_id() }}" data-post-time="{{ post.post_time }}"{% if thread.thread_locked == True %} disabled{% endif %}><span class="glyphicon glyphicon-trash"></span></button>
+            </div>
+            {% elif guest.guest_id == user_entity.user_id and post.post_author == guest.guest_id and post.post_first == True %}
+            <div class="panel-footer text-right">
+                <button class="btn btn-primary editPost" data-id="{{ event.key.integer_id() }}" data-thread-id="{{ thread.key.integer_id() }}" data-post-time="{{ post.post_time }}"{% if thread.thread_locked == True %} disabled{% endif %}><span class="glyphicon glyphicon-edit"></span></button>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endfor %}
+    <div class="panel panel-default add">
+        <div class="panel-body addPostArea">
+            <form method="post" action="/addPost">
+                <div class="form-group">
+                    <textarea class="form-control wysihtml5" rows="10" name="post_content" required></textarea>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary addPost" type="button" data-id="{{ event.key.integer_id() }}" data-thread-id="{{ thread.key.integer_id() }}"><span class="glyphicon glyphicon-plus"></span> Add Post</button>
+                </div>
+            </form>
+        </div>
+        <div class="panel-body text-muted addPostDisabled">
+            Thread is locked.
+        </div>
+    </div>
+{% endblock %}

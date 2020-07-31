@@ -1,0 +1,77 @@
+{% extends "/templates/_event.html" %}
+{% block event %}
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Going <span class="going_count pull-right">{{ status_count [0] }}</span></h3>
+                </div>
+                <ul class="list-group guests_going">
+                    {% for guest in event.event_guests %}
+                        {% if guest.guest_status == "going" %}
+                            {% for user in users_list %}
+                                {% if user.user_id == guest.guest_id %}
+                                    <li class="list-group-item" data-id="{{ user.user_id }}">
+                                        <img src="{{ user.user_public_profile_photo_url }}" class="img-profile">
+                                        <a href="{{ user.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                                        {% if guest.guest_permissions == "admin" %}
+                                            <span class="badge">Admin</span>
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="panel panel-warning">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Maybe <span class="maybe_count pull-right">{{ status_count [1] }}</span></h3>
+                </div>
+                <ul class="list-group guests_maybe">
+                    {% for guest in event.event_guests %}
+                        {% if guest.guest_status == "maybe" %}
+                            {% for user in users_list %}
+                                {% if user.user_id == guest.guest_id %}
+                                    <li class="list-group-item" data-id="{{ user.user_id }}">
+                                        <img src="{{ user.user_public_profile_photo_url }}" class="img-profile">
+                                        <a href="{{ user.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                                        {% if guest.guest_permissions == "admin" %}
+                                            <span class="badge">Admin</span>
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Not Going <span class="notgoing_count pull-right">{{ status_count [2] }}</span></h3>
+                </div>
+                <ul class="list-group guests_notgoing">
+                    {% for guest in event.event_guests %}
+                        {% if guest.guest_status == "notgoing" %}
+                            {% for user in users_list %}
+                                {% if user.user_id == guest.guest_id %}
+                                    <li class="list-group-item" data-id="{{ user.user_id }}">
+                                        <img src="{{ user.user_public_profile_photo_url }}" class="img-profile">
+                                        <a href="{{ user.user_public_profile_url }}" target="_blank">{{ user.user_name }}</a>
+                                        {% if guest.guest_permissions == "admin" %}
+                                            <span class="badge">Admin</span>
+                                        {% endif %}
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

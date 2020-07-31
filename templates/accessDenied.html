@@ -1,0 +1,12 @@
+{% extends "/templates/_base.html" %}
+{% block title %}Eventum | Access Denied{% endblock %}
+{% block content %}
+    <div class="jumbotron">
+        <div class="container text-center">
+            <h1>Access Denied</h1>
+            <p>You are not authorised to view/modify <em>{{ event.event_name }}</em>.</p>
+            <p>Try asking an admin of <em>{{ event.event_name }}</em> to grant you access or use the friendly button below to return home.</p>
+            <a href="/" class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-home"></span> Go Home</a>
+        </div>
+    </div>
+{% endblock %}

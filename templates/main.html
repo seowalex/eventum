@@ -1,0 +1,86 @@
+{% extends "/templates/_base.html" %}
+{% block title %}Eventum | Events{% endblock %}
+{% block content %}
+    <div class="container event-container">
+        <div class="page-header row">
+            <div class="col-xs-9">
+                <h1><span class="glyphicon glyphicon-calendar"></span> Events</h1>
+            </div>
+            <div class="col-xs-3 vertical-align">
+                <a href="/createEvent" class="btn btn-primary pull-right col-sm-hide"><span class="glyphicon glyphicon-plus"></span><span> Create Event</span></a>
+            </div>
+        </div>
+
+        {% if events.count() %}
+
+        {% for event in events %}
+        <div class="event" data-name="{{ event.event_name }}">
+            <div class="row">
+                <div class="col-xs-6 col-sm-8 col-md-7 col-lg-8">
+                    <h2 class="event-title"><a href="/event?id={{event.key.integer_id()}}">{{event.event_name}}</a></h2>
+                    <div>
+                        {% if event.event_datetime_start and event.event_datetime_end %}
+                        <span class="eventDateTime">{{ event.event_datetime_start }}</span> to <span class="eventDateTime">{{ event.event_datetime_end }}</span>
+                        {% else %}
+                        No date specified
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-sm-4 col-md-5 col-lg-4 text-right">
+                    <div class="btn-group" data-toggle="buttons" data-id="{{ event.key.integer_id() }}">
+                        <label class="btn btn-default going col-xs-hide
+                            {% for guest in event.event_guests %}
+                                {% if user_entity.user_id == guest.guest_id and guest.guest_status == 'going' %}
+                                    active
+                                {% endif %}
+                            {% endfor %}
+                        ">
+                            <input type="radio" name="participation" value="going"{% for guest in event.event_guests %}{% if user_entity.user_id == guest.guest_id and guest.guest_status == "going" %} checked{% endif %}{% endfor %}><span class="glyphicon glyphicon-ok"></span><span> Going</span>
+                        </label>
+                        <label class="btn btn-default maybe col-xs-hide
+                            {% for guest in event.event_guests %}
+                                {% if user_entity.user_id == guest.guest_id and guest.guest_status == 'maybe' %}
+                                    active
+                                {% endif %}
+                            {% endfor %}
+                        ">
+                            <input type="radio" name="participation" value="maybe"{% for guest in event.event_guests %}{% if user_entity.user_id == guest.guest_id and guest.guest_status == "maybe" %} checked{% endif %}{% endfor %}><span class="glyphicon glyphicon-adjust"></span><span> Maybe</span>
+                        </label>
+                        <label class="btn btn-default notgoing col-xs-hide
+                            {% for guest in event.event_guests %}
+                                {% if user_entity.user_id == guest.guest_id and guest.guest_status == 'notgoing' %}
+                                    active
+                                {% endif %}
+                            {% endfor %}
+                        ">
+                            <input type="radio" name="participation" value="notgoing"{% for guest in event.event_guests %}{% if user_entity.user_id == guest.guest_id and guest.guest_status == "notgoing" %} checked{% endif %}{% endfor %}><span class="glyphicon glyphicon-remove"></span><span> Not Going</span>
+                        </label>
+                    </div>
+                    {% for guest in event.event_guests %}
+                        {% if guest.guest_id == user_entity.user_id and guest.guest_permissions == "admin" %}
+                            <div class="btn-group text-left">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                    <span class="glyphicon glyphicon-cog"></span> <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-right">
+                                    <li><a href="#" data-id="{{ event.key.integer_id() }}" class="invite"><span class="glyphicon glyphicon-share"></span> Invite</a></li>
+                                    <li><a href="/editEvent?id={{ event.key.integer_id() }}"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="#" class="deleteEvent" data-id="{{ event.key.integer_id() }}" data-name="{{ event.event_name }}"><span class="glyphicon glyphicon-trash"></span> Delete</a></li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <hr>
+        </div>
+        {% endfor %}
+
+        {% else %}
+        <h2 class="text-center text-muted">No events</h2>
+
+        {% endif %}
+    </div>
+{% endblock %}

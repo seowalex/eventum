@@ -1,0 +1,126 @@
+{% extends "/templates/_base.html" %}
+{% block title %}Eventum | Create Event{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="page-header">
+            <h1><span class="glyphicon glyphicon-plus-sign"></span> Create Event</h1>
+        </div>
+
+        <form class="form-horizontal" method="post">
+            <div class="form-group">
+                <label for="inputName" class="col-xs-3 col-sm-2 control-label">Name:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <input type="text" class="form-control" id="inputName" placeholder="Name of Event" name="event_name" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputDescription" class="col-xs-3 col-sm-2 control-label">Description:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <textarea class="form-control wysihtml5" id="inputDescription" rows="10" placeholder="Description of Event" name="event_description"></textarea>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputDateVoting" class="col-xs-3 col-sm-2 control-label">Date Voting:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <div class="btn-group" id="inputDateVoting" data-toggle="buttons">
+                        <label class="btn btn-default active">
+                            <input type="radio" name="date_voting_enabled" value="True" checked><span class="glyphicon glyphicon-ok"></span> Enable
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="radio" name="date_voting_enabled" value="False"><span class="glyphicon glyphicon-remove"></span> Disable
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="well dateOptions row linkeddatetimepicker">
+                <div class="form-group col-xs-12 col-sm-6">
+                    <label for="inputStartingtDateTime" class="col-xs-3 col-sm-4 control-label">Starting Date & Time:</label>
+                    <div class="col-xs-9 col-sm-8">
+                        <div class="input-group date">
+                            <input type="text" class="form-control" id="inputStartingtDateTime" placeholder="12/12/2012 12:12 AM" name="event_datetime_start">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-xs-12 col-sm-6">
+                    <label for="inputEndingDateTime" class="col-xs-3 col-sm-4 control-label">Ending Date & Time:</label>
+                    <div class="col-xs-9 col-sm-8">
+                        <div class="input-group date">
+                            <input type="text" class="form-control" id="inputEndingDateTime" placeholder="12/12/2012 12:12 AM" name="event_datetime_end">
+                            <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputForum" class="col-xs-3 col-sm-2 control-label">Forum:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <div class="btn-group" id="inputForum" data-toggle="buttons">
+                        <label class="btn btn-default active">
+                            <input type="radio" name="forum_enabled" value="True" checked><span class="glyphicon glyphicon-ok"></span> Enable
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="radio" name="forum_enabled" value="False"><span class="glyphicon glyphicon-remove"></span> Disable
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputLogistics" class="col-xs-3 col-sm-2 control-label">Logistics:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <div class="btn-group" id="inputLogistics" data-toggle="buttons">
+                        <label class="btn btn-default active">
+                            <input type="radio" name="logistics_enabled" value="True" checked><span class="glyphicon glyphicon-ok"></span> Enable
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="radio" name="logistics_enabled" value="False"><span class="glyphicon glyphicon-remove"></span> Disable
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputLocation" class="col-xs-3 col-sm-2 control-label">Location Type:</label>
+                <div class="col-xs-9 col-sm-10">
+                    <select name="location_type" class="selectpicker show-tick" id="inputLocation" data-width="100%">
+                        <option value="voting">Through Voting</option>
+                        <option value="fixed">Fixed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="well locationOptions">
+                <div class="form-group">
+                    <label for="inputLocationName" class="col-xs-3 col-sm-2 control-label">Location Name:</label>
+                    <div class="col-xs-9 col-sm-10">
+                        <input type="text" class="form-control" id="inputLocationName" placeholder="Name of Location" name="location_name">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="gmaps-input-address" class="col-xs-3 col-sm-2 control-label">Location Address:</label>
+                    <div class="col-xs-9 col-sm-10">
+                        <input type="text" class="form-control" id="gmaps-input-address" placeholder="Address of Location" name="location_address">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div id="gmaps-canvas"></div>
+                </div>
+                <div class="hide">
+                    <input type="text" name="location_lat"  id="add_location_lat">
+                    <input type="text" name="location_long" id="add_location_long">
+                </div>
+                <div class="form-group">
+                    <label for="inputLocationNotes" class="col-xs-3 col-sm-2 control-label">Location Notes:</label>
+                    <div class="col-xs-9 col-sm-10">
+                        <textarea class="form-control wysihtml5" id="inputLocationNotes" rows="10" placeholder="Notes for Location" name="location_notes"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="visible-xs col-xs-3"></div>
+                <div class="col-xs-9 col-sm-10 col-sm-offset-2">
+                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Create Event</button>
+                    <a href="/" class="btn btn-default"><span class="glyphicon glyphicon-ban-circle"></span> Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
